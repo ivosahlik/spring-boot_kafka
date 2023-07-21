@@ -57,9 +57,9 @@ public class MyProducer {
                 payload
         );
 
-        producerRecord
-                .headers()
-                .add("trace_id", UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8));
+//        producerRecord
+//                .headers()
+//                .add("trace_id", UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8));
 
         kafkaTemplate.send(producerRecord);
     }
