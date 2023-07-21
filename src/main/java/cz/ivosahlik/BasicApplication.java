@@ -12,6 +12,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @EnableKafka
 @SpringBootApplication
@@ -48,14 +49,23 @@ public class BasicApplication {
 
     @Bean
     public ApplicationRunner runner(MyProducer producer) {
+
+        var customer_1 = UUID.randomUUID();
+        var customer_2 = UUID.randomUUID();
+        var customer_3 = UUID.randomUUID();
+
+        UUID[] customerIds = new UUID[] {customer_1, customer_2, customer_3};
+
         return args -> {
             while (true) {
 //                producer.sendMessage("spring-topic", "New Event ID: " + UUID.randomUUID());
 
                 var customer = new Customer(UUID.randomUUID(), "fake customer name", "customer address");
 
+                var index = ThreadLocalRandom.current().nextInt(0, 3);
+
                 var event = new Event<>(
-                        UUID.randomUUID(),
+                        customerIds[index],
                         "ADD_CUSTOMER",
                         Timestamp.from(Instant.now()),
                         customer

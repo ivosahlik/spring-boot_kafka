@@ -14,6 +14,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.function.Consumer;
 
 @Component
 public class MyConsumer {
@@ -34,8 +35,7 @@ public class MyConsumer {
     public void listen(
             @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
             @Header("trace_id") String traceId,
-//            @Header(KafkaHeaders.CONSUMER) Consumer<String, String> consumer,
-//            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partitionId,
+            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partitionId,
             @Payload String payload
     ) throws JsonProcessingException {
 
@@ -45,6 +45,13 @@ public class MyConsumer {
 
             Event<Customer> event = mapper.readValue(payload, new TypeReference<>() {});
             System.out.println(LocalDateTime.now() + " DESERIALIZATION - Received new event: " + event.eventId());
+
+            logger.info("""
+                Key: {}
+                PartitionId: {}
+                event: {}
+                ====================================================================================
+                """, key, partitionId, event);
 
         } catch (JsonProcessingException e) {
             System.out.println("Error occurred");
