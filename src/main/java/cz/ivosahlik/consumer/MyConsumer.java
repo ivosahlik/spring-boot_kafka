@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.ivosahlik.dto.Customer;
 import cz.ivosahlik.event.Event;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -14,7 +15,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.function.Consumer;
 
 @Component
 public class MyConsumer {
@@ -36,6 +36,7 @@ public class MyConsumer {
             @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
             @Header("trace_id") String traceId,
             @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partitionId,
+            @Header(KafkaHeaders.CONSUMER) Consumer<String, String> consumer,
             @Payload String payload
     ) throws JsonProcessingException {
 
@@ -49,9 +50,10 @@ public class MyConsumer {
             logger.info("""
                 Key: {}
                 PartitionId: {}
+                ConsumerId: {}
                 event: {}
                 ====================================================================================
-                """, key, partitionId, event);
+                """, key, partitionId, consumer.groupMetadata().memberId(), event);
 
         } catch (JsonProcessingException e) {
             System.out.println("Error occurred");
